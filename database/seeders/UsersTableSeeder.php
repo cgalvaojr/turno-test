@@ -13,21 +13,23 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::factory(1)->create(
+        $users = User::factory()->createMany([
             [
                 'first_name' => 'Luke',
                 'last_name' => 'Skywalker',
                 'email' => 'luke@jedi.com',
-                'email_verified_at' => null,
+                'email_verified_at' => now(),
+                'password' => bcrypt('123123'),
+            ],
+            [
+                'first_name' => 'Darth',
+                'last_name' => 'Vader',
+                'email' => 'vader@jedi.com',
+                'email_verified_at' => now(),
                 'password' => bcrypt('123123'),
             ]
-        );
+        ]);
 
-        Bouncer::assign('admin')->to($users->first());
-
-        $others = User::factory(20)->create();
-        foreach ($others as $model) {
-            Bouncer::assign('regular')->to($model);
-        }
+        Bouncer::assign('admin')->to($users->all());
     }
 }

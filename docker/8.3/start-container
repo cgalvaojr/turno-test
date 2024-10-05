@@ -1,20 +1,33 @@
 #!/usr/bin/env bash
 
+# Run database migrations and seeders
+php artisan migrate
+php artisan db:seed
+
+# Check if SUPERVISOR_PHP_USER is set correctly
 if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "sail" ]; then
     echo "You should set SUPERVISOR_PHP_USER to either 'sail' or 'root'."
     exit 1
 fi
 
+# Update user ID if WWWUSER is set
 if [ ! -z "$WWWUSER" ]; then
     usermod -u $WWWUSER sail
 fi
 
+# Ensure /.composer directory exists and is writable
 if [ ! -d /.composer ]; then
     mkdir /.composer
 fi
 
 chmod -R ugo+rw /.composer
 
+# Install npm dependencies and start watching for changes
+npm install
+npm run dev &
+#npm run watch &
+
+# Start the supervisor process
 if [ $# -gt 0 ]; then
     if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
         exec "$@"
@@ -24,5 +37,3 @@ if [ $# -gt 0 ]; then
 else
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 fi
-
-php artisan migrate

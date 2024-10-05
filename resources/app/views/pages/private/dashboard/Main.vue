@@ -14,14 +14,20 @@
 import {defineComponent} from 'vue';
 import {trans} from "@/helpers/i18n";
 import Page from "@/views/layouts/Page";
+import WeatherService from "@/services/WeatherService";
 
 export default defineComponent({
     components: {
-        Page
+        Page,
     },
+    actions: {},
     setup() {
+        const weatherService = new WeatherService();
+
+        console.log(weatherService.getWeather('teste', '123'));
         return {
-            trans
+            trans,
+            weatherService
         }
     }
 });

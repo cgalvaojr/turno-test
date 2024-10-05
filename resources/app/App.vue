@@ -24,16 +24,6 @@
             <nav class="text-white text-base py-4 px-3 rounded">
                 <Menu :state="state" :type="'desktop'"/>
             </nav>
-            <template v-if="state.footerLeftLink">
-                <a v-if="state.footerLeftLink.href" :href="state.footerLeftLink.href" class="absolute w-full bottom-0 bg-theme-800 text-white flex items-center justify-center py-4">
-                    <Icon :name="state.footerLeftLink.icon" class="mr-3"/>
-                    {{ state.footerLeftLink.name }}
-                </a>
-                <router-link v-else :to="state.footerLeftLink.to">
-                    <Icon :name="state.footerLeftLink.icon" class="mr-3"/>
-                    {{ state.footerLeftLink.name }}
-                </router-link>
-            </template>
         </aside>
         <div class="relative w-full flex flex-col h-screen overflow-y-hidden">
             <!-- Desktop Header -->
@@ -70,13 +60,6 @@
                         <i v-else class="fa fa-times"></i>
                     </button>
                 </div>
-                <nav :class="state.isMobileMenuOpen ? 'flex': 'hidden'" class="flex flex-col pt-4 text-base text-white">
-                    <Menu :state="state" :type="'mobile'"/>
-                    <button class="w-full bg-theme-800 text-white font-semibold py-2 mt-3 rounded-lg shadow-lg hover:shadow-xl hover:text-theme-800 hover:bg-gray-300 flex items-center justify-center">
-                        <Icon name="paperclip" class="mr-3"/>
-                        {{ trans('global.buttons.documentation') }}
-                    </button>
-                </nav>
             </header>
 
             <div class="w-full h-screen overflow-x-hidden border-t flex flex-col">
