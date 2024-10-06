@@ -38,5 +38,9 @@ Route::middleware(['auth:sanctum', 'apply_locale'])->group(function () {
      */
     Route::get('/roles/search', [RoleController::class, 'search'])->middleware('throttle:400,1');
 
-    Route::get('/weather/city/{city}/country/{country}', [WeatherController::class, 'getWeather']);
+    /**
+     * Weather
+     */
+    Route::get('/weather', [WeatherController::class, 'index']);
+    Route::post('/weather/city/{city}/country/{country}', [WeatherController::class, 'store']);
 });
