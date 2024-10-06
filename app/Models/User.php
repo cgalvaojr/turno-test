@@ -6,6 +6,7 @@ use App\Traits\Filterable;
 use App\Traits\Searchable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -145,22 +146,8 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         return $this->isAn('admin');
     }
 
-    /**
-     * Register the conversions
-     *
-     *
-     * @throws \Spatie\Image\Exceptions\InvalidManipulation
-     */
-    public function registerMediaConversions(?Media $media = null): void
+    public function weatherLocations(): HasMany
     {
-        $this->addMediaConversion('small_thumb')
-            ->fit(Manipulations::FIT_CROP, 300, 300)
-            ->nonQueued();
-        $this->addMediaConversion('medium_thumb')
-            ->fit(Manipulations::FIT_CROP, 600, 600)
-            ->nonQueued();
-        $this->addMediaConversion('large_thumb')
-            ->fit(Manipulations::FIT_CROP, 1200, 1200)
-            ->nonQueued();
+        return $this->hasMany(WeatherLocation::class);
     }
 }
