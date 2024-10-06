@@ -17,4 +17,8 @@ export default class UserService extends BaseService {
         async removeLocation(locationId) {
             return this.delete(`/api/weather/${locationId}`);
         }
+
+        async storeLocation(params) {
+            return this.post(`/api/weather`, params);
+        }
 }

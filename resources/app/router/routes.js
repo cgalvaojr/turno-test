@@ -12,6 +12,7 @@ import {default as PageUsersCreate} from "@/views/pages/private/users/Create";
 import {default as PageUsersEdit} from "@/views/pages/private/users/Edit";
 
 import abilities from "@/stub/abilities";
+import NewLocation from "@/views/components/weather/NewLocation.vue";
 
 const routes = [
     {
@@ -22,19 +23,19 @@ const routes = [
     },
     {
         name: "panel",
-        path: "/panel",
+        path: "/location",
         children: [
             {
-                name: "dashboard",
-                path: "dashboard",
+                name: "list",
+                path: "",
                 meta: {requiresAuth: true},
                 component: PageDashboard,
             },
             {
-                name: "profile",
-                path: "profile",
+                name: "new",
+                path: "new",
                 meta: {requiresAuth: true, isOwner: true},
-                component: PageProfile,
+                component: NewLocation,
             },
             {
                 path: "users",

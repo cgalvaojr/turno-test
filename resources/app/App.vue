@@ -2,7 +2,7 @@
     <div class="bg-gray-100 flex" v-if="authStore.user && authStore.user.hasOwnProperty('id')">
         <aside class="relative bg-theme-600 h-screen w-64 hidden sm:block shadow-xl">
             <div class="p-6 border-b border-theme-600">
-                <router-link class="text-white text-3xl font-semibold uppercase hover:text-gray-300" to="/panel/dashboard">
+                <router-link class="text-white text-3xl font-semibold uppercase hover:text-gray-300" to="/location">
                     <template v-if="state.app.logo">
                         <img :src="state.app.logo" :alt="state.app.name"/>
                     </template>
@@ -29,9 +29,6 @@
                     </a>
                     <button v-if="state.isAccountDropdownOpen" @click="state.isAccountDropdownOpen = false" class="h-full w-full fixed inset-0 cursor-pointer"></button>
                     <div v-if="state.isAccountDropdownOpen" class="absolute w-32 bg-white rounded-lg shadow-lg py-2 mt-16 z-50">
-                        <router-link to="/panel/profile" class="block px-4 py-2 hover:bg-theme-800 hover:text-white hover:opacity-80">
-                            {{ trans('global.pages.profile') }}
-                        </router-link>
                         <a href="#" @click.prevent="onLogout" class="block px-4 py-2 hover:bg-theme-800 hover:text-white hover:opacity-80">
                             {{ trans('global.phrases.sign_out') }}
                         </a>
@@ -111,7 +108,7 @@ export default {
                     showDesktop: true,
                     showMobile: true,
                     requiresAbility: false,
-                    to: '/panel/dashboard',
+                    to: '/location',
                 },
                 {
                     name: trans('global.phrases.sign_out'),
@@ -123,12 +120,6 @@ export default {
                     to: '',
                 }
             ],
-            footerLeftLink: {
-                name: trans('global.buttons.documentation'),
-                icon: 'paperclip',
-                to: '',
-                href: '#',
-            },
             isAccountDropdownOpen: false,
             isMobileMenuOpen: false,
             currentExpandedMenuItem: null,

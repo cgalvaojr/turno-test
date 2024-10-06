@@ -10,6 +10,11 @@
                     </div>
                 </div>
             </Modal>
+
+            <div class="flex justify-end mb-4">
+                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" @click="redirectToNewLocation">Create New Location</button>
+            </div>
+
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                 <tr>
@@ -42,6 +47,7 @@
                 </tbody>
             </table>
             <Spinner v-if="isRemoving" />
+            <Alert v-if="errorMessage" :message="errorMessage" type="error" />
         </div>
     </Page>
 </template>
@@ -53,29 +59,35 @@ import Page from "@/views/layouts/Page";
 import Icon from "@/views/components/icons/Icon";
 import Modal from "@/views/components/Modal";
 import WeatherService from "@/services/WeatherService";
-import FormAvatar from "@/views/pages/private/profile/partials/FormAvatar.vue";
 import Spinner from "@/views/components/icons/Spinner.vue";
+import Alert from "@/views/components/Alert.vue";
+import { useRouter } from 'vue-router';
+import {useAlertStore} from "@/stores";
+
 
 export default defineComponent({
     components: {
-        FormAvatar,
         Modal,
         Page,
         Icon,
         Spinner,
+        Alert,
     },
     setup() {
         const isRemoveModalShowing = ref(false);
         const currentLocationId = ref(null);
         const isRemoving = ref(false);
         const weatherService = new WeatherService();
-        const weatherData = ref(null);
+        const weatherData = ref([]);
+        const errorMessage = ref(null);
+        const router = useRouter();
+        const alertStore = useAlertStore();
+        alertStore.$reset();
 
         onMounted(async () => {
             try {
                 const response = await weatherService.getWeather();
                 weatherData.value = response.data.data;
-                console.log(weatherData.value);
             } catch (error) {
                 console.error("Error fetching weather data:", error);
             }
@@ -85,7 +97,6 @@ export default defineComponent({
             isRemoving.value = true;
             try {
                 await weatherService.removeLocation(currentLocationId.value);
-                // Remove the item from the frontend data
                 weatherData.value = weatherData.value.filter(weather => weather.id !== currentLocationId.value);
                 isRemoveModalShowing.value = false;
             } catch (error) {
@@ -95,13 +106,25 @@ export default defineComponent({
             }
         }
 
+        function redirectToNewLocation() {
+            if (weatherData.value.length >= 3) {
+                alertStore.error("You cannot add more than 3 locations.");
+            } else {
+                alertStore.error(null);
+                router.push('/location/new');
+            }
+        }
+
         return {
             trans,
             weatherData,
             isRemoveModalShowing,
             handleRemoveLocation,
             currentLocationId,
-            isRemoving
+            isRemoving,
+            redirectToNewLocation,
+            errorMessage,
+            alertStore
         }
     }
 });

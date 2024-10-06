@@ -11,17 +11,15 @@ class WeatherLocation extends Model
 {
     use HasFactory;
 
-    private const int MAX_LOCATIONS_PER_USER = 3;
-
     protected $fillable = [
         'city',
         'country',
         'user_id',
     ];
 
-    public function userHasReachedLimit($userId): bool
+    public function userLocationCount($userId): int
     {
-        return $this->where('user_id', $userId)->count() >= self::MAX_LOCATIONS_PER_USER;
+        return $this->where('user_id', $userId)->count();
     }
 
     public function weathers(): HasMany

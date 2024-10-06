@@ -12,7 +12,6 @@ class WeatherHttpClient
     private Client $client;
     private array $defaultQueryStringParams;
 
-
     public function __construct()
     {
         try {
@@ -38,15 +37,8 @@ class WeatherHttpClient
             $this->handleErrors($apiResponse);
             return $this->handleResponse($apiResponse);
         } catch (GuzzleException $exception) {
-            if (is_array($queryString)) {
-                $queryString = http_build_query($queryString);
-            }
-            $errorMessage = "Error accessing {$endpoint} with query '{$queryString}': " . $exception->getMessage();
-            logger($errorMessage);
-            throw new \RuntimeException($errorMessage);
-        } catch (\JsonException $e) {
-            logger("Error decoding JSON response: " . $e->getMessage());
-            throw new \RuntimeException("Error decoding JSON response: " . $e->getMessage());
+            logger($exception->getMessage());
+            throw new \RuntimeException($exception->getMessage());
         }
     }
 
@@ -58,13 +50,6 @@ class WeatherHttpClient
             logger("Error decoding JSON response: " . $exception->getMessage());
             throw new \RuntimeException("Error decoding JSON response: " . $exception->getMessage());
         }
-    }
-
-    public function getHeaders(string $token): array
-    {
-        return [
-            'appid' => $token
-        ];
     }
 
     public function handleErrors(ResponseInterface $response): void

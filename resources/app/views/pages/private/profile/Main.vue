@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import {computed, defineComponent, ref} from "vue";
+import { defineComponent, ref} from "vue";
 import {trans} from "@/helpers/i18n";
 import {useAuthStore} from "@/stores/auth";
 import FormPassword from "@/views/pages/private/profile/partials/FormPassword";
