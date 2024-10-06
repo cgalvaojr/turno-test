@@ -2,11 +2,14 @@
 
 namespace App\Http\Clients;
 
-use App\Exceptions\JogosHoje\FootballHttpClientExceptionHandler;
 use App\Exceptions\WeatherHttpClientExceptionHandler;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
+use GuzzleHttp\HandlerStack;
+
 class WeatherHttpClient
 {
     private Client $client;
@@ -14,15 +17,41 @@ class WeatherHttpClient
 
     public function __construct()
     {
-        try {
-            $this->defaultQueryStringParams = [
-                'appid' => config('services.api.secret')
-            ];
-            $this->client = new Client(['base_uri' => config('services.api.host'), 'query' => ['appid' => config('services.api.secret')]]);
-        } catch (\Exception $exception) {
-            logger($exception->getMessage());
-            throw new \RuntimeException($exception->getMessage());
-        }
+        $this->defaultQueryStringParams = [
+            'appid' => config('services.api.secret')
+        ];
+
+        $handlerStack = HandlerStack::create();
+        $handlerStack->push($this->errorHandlerMiddleware());
+
+        $this->client = new Client([
+            'base_uri' => config('services.api.host'),
+            'query' => ['appid' => config('services.api.secret')],
+            'handler' => $handlerStack,
+        ]);
+    }
+
+    private function errorHandlerMiddleware(): \Closure
+    {
+        return function (callable $handler) {
+            return static function (RequestInterface $request, array $options) use ($handler) {
+                return $handler($request, $options)->then(
+                    function (ResponseInterface $response) {
+                        // Handle successful response
+                        return $response;
+                    },
+                    function (RequestException $exception) {
+                        // Handle error response
+                        $response = $exception->getResponse();
+                        if ($response) {
+                            $handler = new WeatherHttpClientExceptionHandler($response);
+                            $handler->handle();
+                        }
+                        throw $exception;
+                    }
+                );
+            };
+        };
     }
 
     public function get(string $endpoint, string|array $queryString = ''): mixed
@@ -31,15 +60,14 @@ class WeatherHttpClient
             $queryString = [];
         }
 
+        $queryString = array_merge($this->defaultQueryStringParams, $queryString);
         try {
-            $queryString = array_merge($this->defaultQueryStringParams, $queryString);
             $apiResponse = $this->client->get($endpoint, ['query' => $queryString]);
-            $this->handleErrors($apiResponse);
-            return $this->handleResponse($apiResponse);
-        } catch (GuzzleException $exception) {
-            logger($exception->getMessage());
-            throw new \RuntimeException($exception->getMessage());
+        } catch (GuzzleException $e) {
+            logger("HTTP Request Error: " . $e->getMessage());
+            throw new \RuntimeException($e->getMessage());
         }
+        return $this->handleResponse($apiResponse);
     }
 
     public function handleResponse(ResponseInterface $response): mixed
@@ -50,11 +78,5 @@ class WeatherHttpClient
             logger("Error decoding JSON response: " . $exception->getMessage());
             throw new \RuntimeException("Error decoding JSON response: " . $exception->getMessage());
         }
-    }
-
-    public function handleErrors(ResponseInterface $response): void
-    {
-        $handler = new WeatherHttpClientExceptionHandler($response);
-        $handler->handle();
     }
 }

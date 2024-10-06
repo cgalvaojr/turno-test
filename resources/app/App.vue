@@ -39,7 +39,7 @@
             <!-- Mobile Header & Nav -->
             <header class="w-full bg-theme-600 py-5 px-6 sm:hidden">
                 <div class="flex items-center justify-between">
-                    <router-link class="text-white text-3xl font-semibold uppercase hover:text-gray-300" to="/panel/dashboard">
+                    <router-link class="text-white text-3xl font-semibold uppercase hover:text-gray-300" to="/location">
                         {{ state.app.name }}
                     </router-link>
                     <button @click="state.isMobileMenuOpen = !state.isMobileMenuOpen" class="text-white text-3xl focus:outline-none">

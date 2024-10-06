@@ -62,7 +62,7 @@ return [
     */
 
     //'home' => AppServiceProvider::HOME,
-    'home' => env('APP_URL').'/panel/dashboard',
+    'home' => env('APP_URL').'/location',
 
     /*
     |--------------------------------------------------------------------------

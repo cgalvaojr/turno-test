@@ -21,4 +21,8 @@ export default class UserService extends BaseService {
         async storeLocation(params) {
             return this.post(`/api/weather`, params);
         }
+
+        async getAllWeatherLocations(id) {
+            return this.get(`/api/weather/${id}`);
+        }
 }

@@ -23,64 +23,40 @@ class WeatherHttpClientExceptionHandler extends Exception
         try {
             $this->isValidStatusCode()
                 ->isValidJson()
-                ->isValidRateLimit()
-                ->isValidRequest()
+                ->isFound()
                 ->isValidToken();
-        } catch (HttpClientException $e) {
-            logger("HTTP Request Error: " . $e->getMessage());
-            throw new RuntimeException("HTTP Request Error: " . $e->getMessage());
-        } catch (RuntimeException $e) {
-            logger("Runtime Error: " . $e->getMessage());
-            throw $e;
-        } catch (Exception $e) {
-            logger("Unexpected Error: " . $e->getMessage());
-            throw new RuntimeException("Unexpected Error: " . $e->getMessage());
-        } catch (Throwable $e) {
-            logger("Unexpected Error: " . $e->getMessage());
-            throw new RuntimeException("Unexpected Error: " . $e->getMessage());
-        }
-    }
-
-    public function isValidToken(): void
-    {
-        try {
-            $responseBody = json_decode($this->response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (HttpClientException $exception) {
+            logger("HTTP Request Error: " . $exception->getMessage());
+            throw new RuntimeException($exception->getMessage());
         } catch (\JsonException $exception) {
             logger("Error decoding JSON response: " . $exception->getMessage());
             throw new RuntimeException("Error decoding JSON response: " . $exception->getMessage());
         }
-
-        if (isset($responseBody['errors']['token'])) {
-            throw new HttpClientException($responseBody['errors']['token']);
-        }
     }
 
-    public function isValidRequest(): self
+    public function isFound(): self
     {
         $responseBody = json_decode($this->response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
-        if (isset($responseBody['errors']['requests'])) {
-            throw new HttpClientException($responseBody['errors']['requests']);
+        if ($responseBody['cod'] === '404') {
+            throw new HttpClientException($responseBody['message']);
         }
         return $this;
+    }
+
+    public function isValidToken(): void
+    {
+        $responseBody = json_decode($this->response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        if ($responseBody['cod'] === 401) {
+            throw new HttpClientException($responseBody['message']);
+        }
     }
 
     public function isValidStatusCode(): self
     {
         $statusCode = $this->response->getStatusCode();
         if ($statusCode >= 400 && $statusCode <= 500) {
-            throw new HttpClientException(
-                "API returned HTTP error {$this->response->getStatusCode()} ({$this->response->getReasonPhrase()})"
-            );
-        }
-        return $this;
-    }
-
-    public function isValidRateLimit(): self
-    {
-        $responseBody = json_decode($this->response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        if (isset($responseBody['errors']['rateLimit'])) {
-            throw new HttpClientException($responseBody['errors']['rateLimit']);
+            $responseBody = json_decode($this->response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+            throw new HttpClientException($responseBody['message']);
         }
         return $this;
     }

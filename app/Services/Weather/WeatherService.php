@@ -5,7 +5,9 @@ namespace App\Services\Weather;
 use App\Http\Clients\WeatherHttpClient;
 use App\Models\Weather;
 use App\Models\WeatherLocation;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class WeatherService
 {
@@ -20,9 +22,9 @@ class WeatherService
     {
     }
 
-    public function getWeather(int $userId)
+    public function getWeather(): Builder
     {
-        return $this->weatherLocationModel->with('weathers')->where('user_id', $userId)->get();
+        return $this->weatherLocationModel->with('weathers');
     }
 
     public function removeWheaterLocation($locationId)
@@ -32,28 +34,54 @@ class WeatherService
 
     public function fetchWeatherFromApi(string $country, string $city): object
     {
-        return $this->client->get(self::API_ENDPOINT, ['q' => "$city,$country"]);
+        return $this->client->get(self::API_ENDPOINT, ['q' => "$city,$country", 'units' => 'imperial']);
     }
 
     public function createLocation(string $country, string $city): void
     {
+        $this->checkLocationExists($country, $city);
         if($this->userCanCreateLocations()) {
             $apiResult = $this->fetchWeatherFromApi($country, $city);
-            $parsedApiData = $this->parseApiDataForDatabase($apiResult);
-
-            DB::transaction(function () use ($parsedApiData, $country, $city) {
+            $filteredData = $this->filterWeatherDataByDate($apiResult);
+            DB::transaction(function () use ($filteredData, $country, $city) {
                 $weatherLocation = $this->weatherLocationModel->create([
                     'user_id' => auth()->id(),
                     'city' => $city,
                     'country' => $country,
                 ]);
 
-                $this->weatherModel->create([
-                    'weather_location_id' => $weatherLocation->id,
-                    $parsedApiData
-                ]);
+                $parsedApiData = $this->parseApiDataForDatabase($filteredData, $weatherLocation->id);
+                $this->weatherModel->insert($parsedApiData);
             });
         }
+    }
+
+    private function checkLocationExists(string $country, string $city): void
+    {
+        $location = $this->weatherLocationModel
+            ->where('city', $city)
+            ->where('country', $country)
+            ->where('user_id', auth()->id())
+            ->first();
+        if($location) {
+            throw new \RuntimeException('Location already exists');
+        }
+    }
+
+    public function filterWeatherDataByDate(object $apiData): array
+    {
+        $filteredData = [];
+        $today = Carbon::today()->startOfDay();
+        $dayAfterTomorrow = Carbon::today()->addDays(2)->endOfDay();
+
+        foreach ($apiData->list as $entry) {
+            $entryDate = Carbon::parse($entry->dt_txt);
+            if ($entryDate->between($today, $dayAfterTomorrow)) {
+                $filteredData[] = $entry;
+            }
+        }
+
+        return $filteredData;
     }
 
     private function userCanCreateLocations(): bool
@@ -64,13 +92,13 @@ class WeatherService
         }
         throw new \RuntimeException('User has reached the limit of locations');
     }
-    private function parseApiDataForDatabase(object $apiData): array
+    private function parseApiDataForDatabase(array $apiData, int $locationId): array
     {
         $weatherData = [];
 
-        foreach ($apiData->list as $entry) {
+        foreach ($apiData as $entry) {
             $weatherData[] = [
-                'dt' => $entry->dt,
+                'weather_location_id' => $locationId,
                 'temp' => $entry->main->temp,
                 'feels_like' => $entry->main->feels_like,
                 'temp_min' => $entry->main->temp_min,
@@ -90,9 +118,6 @@ class WeatherService
                 'dt_txt' => $entry->dt_txt,
             ];
         }
-
         return $weatherData;
     }
-
-
 }

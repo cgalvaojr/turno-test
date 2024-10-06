@@ -1,6 +1,7 @@
 <template>
     <Page>
         <div>
+            <h2 class="text-lg font-semibold mb-4">Locations</h2>
             <Modal :is-showing="isRemoveModalShowing" @close="isRemoveModalShowing = false;">
                 <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-md">
                     <p class="text-lg font-semibold mb-4">Are you sure you want to proceed?</p>
@@ -24,26 +25,31 @@
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="(weather, index) in weatherData" :key="index">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="text-sm font-medium text-gray-900">{{ weather.country }}</div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ weather.city }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900 flex space-x-2">
-                            <button class="text-blue-500 hover:text-blue-700">
-                                <Icon name="eye" title="See details" />
-                            </button>
-                            <button class="text-red-500 hover:text-red-700">
-                                <Icon name="trash" title="Remove forecast" @click="isRemoveModalShowing = true;currentLocationId = weather.id" />
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                    <tr v-for="(weather, index) in weatherData" :key="index" v-if="weatherData.length > 0">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="text-sm font-medium text-gray-900">{{ weather.country }}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ weather.city }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900 flex space-x-2">
+                                <button class="text-blue-500 hover:text-blue-700">
+                                    <Icon name="eye" title="See details" @click="showLocationWeather(weather.id)" />
+                                </button>
+                                <button class="text-red-500 hover:text-red-700">
+                                    <Icon name="trash" title="Remove forecast" @click="isRemoveModalShowing = true;currentLocationId = weather.id" />
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-else>
+                        <td class="px-6 py-4 whitespace-nowrap" colspan="3">
+                            <div class="text-sm font-medium text-gray-900">No locations found.</div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <Spinner v-if="isRemoving" />
@@ -54,15 +60,15 @@
 
 <script>
 import { defineComponent, ref, onMounted } from 'vue';
-import { trans } from "@/helpers/i18n";
-import Page from "@/views/layouts/Page";
-import Icon from "@/views/components/icons/Icon";
-import Modal from "@/views/components/Modal";
+import { trans } from "@/helpers/i18n.js";
+import Page from "@/views/layouts/Page.vue";
+import Icon from "@/views/components/icons/Icon.vue";
+import Modal from "@/views/components/Modal.vue";
 import WeatherService from "@/services/WeatherService";
 import Spinner from "@/views/components/icons/Spinner.vue";
 import Alert from "@/views/components/Alert.vue";
 import { useRouter } from 'vue-router';
-import {useAlertStore} from "@/stores";
+import {useAlertStore} from "@/stores/index.js";
 
 
 export default defineComponent({
@@ -82,7 +88,6 @@ export default defineComponent({
         const errorMessage = ref(null);
         const router = useRouter();
         const alertStore = useAlertStore();
-        alertStore.$reset();
 
         onMounted(async () => {
             try {
@@ -99,11 +104,16 @@ export default defineComponent({
                 await weatherService.removeLocation(currentLocationId.value);
                 weatherData.value = weatherData.value.filter(weather => weather.id !== currentLocationId.value);
                 isRemoveModalShowing.value = false;
+                alertStore.success("Location removed successfully!");
             } catch (error) {
                 console.error("Error removing location:", error);
             } finally {
                 isRemoving.value = false;
             }
+        }
+
+        function showLocationWeather(locationId) {
+            router.push(`/location/${locationId}`);
         }
 
         function redirectToNewLocation() {
@@ -124,7 +134,8 @@ export default defineComponent({
             isRemoving,
             redirectToNewLocation,
             errorMessage,
-            alertStore
+            alertStore,
+            showLocationWeather
         }
     }
 });

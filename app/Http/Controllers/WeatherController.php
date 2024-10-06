@@ -16,7 +16,13 @@ class WeatherController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $locationsData = $this->service->getWeather($request->user()->id);
+        $locationsData = $this->service->getWeather()->where('user_id', $request->user()->id)->get();
+        return WeatherLocationResource::collection($locationsData);
+    }
+
+    public function show(int $id): AnonymousResourceCollection
+    {
+        $locationsData = $this->service->getWeather()->where('id', $id)->get();
         return WeatherLocationResource::collection($locationsData);
     }
 

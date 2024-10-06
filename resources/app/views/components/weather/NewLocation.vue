@@ -57,6 +57,7 @@ export default defineComponent({
             isSaving.value = true;
             try {
                 await weatherService.storeLocation({ country: country.value, city: city.value });
+                await alertStore.success("Location stored successfully!");
                 await router.push('/location');
             } catch (error) {
                 alertStore.error(error.response.data.message);

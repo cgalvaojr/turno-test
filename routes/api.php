@@ -42,7 +42,7 @@ Route::middleware(['auth:sanctum', 'apply_locale'])->group(function () {
      * Weather
      */
     Route::get('/weather', [WeatherController::class, 'index']);
-    Route::get('/weather/city/{city}/country/{country}', [WeatherController::class, 'show']);
+    Route::get('/weather/{locationId}/', [WeatherController::class, 'show']);
     Route::post('/weather', [WeatherController::class, 'store']);
     Route::delete('/weather/{locationId}', [WeatherController::class, 'delete']);
 });
