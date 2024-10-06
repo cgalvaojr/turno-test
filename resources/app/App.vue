@@ -10,16 +10,6 @@
                         {{ state.app.name }}
                     </template>
                 </router-link>
-                <template v-if="state.headerLeftLink">
-                    <a v-if="state.headerLeftLink.href" :href="state.headerLeftLink.href" class="w-full bg-white cta-btn font-semibold py-2 mt-5 rounded-br-lg rounded-bl-lg rounded-tr-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center">
-                        <Icon :name="state.headerLeftLink.icon" class="mr-3"/>
-                        {{ state.headerLeftLink.name }}
-                    </a>
-                    <router-link v-else :to="state.headerLeftLink.to" class="w-full bg-white cta-btn font-semibold py-2 mt-5 rounded-br-lg rounded-bl-lg rounded-tr-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center">
-                        <Icon :name="state.headerLeftLink.icon" class="mr-3"/>
-                        {{ state.headerLeftLink.name }}
-                    </router-link>
-                </template>
             </div>
             <nav class="text-white text-base py-4 px-3 rounded">
                 <Menu :state="state" :type="'desktop'"/>
@@ -42,9 +32,9 @@
                         <router-link to="/panel/profile" class="block px-4 py-2 hover:bg-theme-800 hover:text-white hover:opacity-80">
                             {{ trans('global.pages.profile') }}
                         </router-link>
-                        <a href="#" @click.prevent="onLogout" class="block px-4 py-2 hover:bg-theme-800 hover:text-white hover:opacity-80">{{
-                                trans('global.phrases.sign_out')
-                            }}</a>
+                        <a href="#" @click.prevent="onLogout" class="block px-4 py-2 hover:bg-theme-800 hover:text-white hover:opacity-80">
+                            {{ trans('global.phrases.sign_out') }}
+                        </a>
                     </div>
                 </div>
             </header>
@@ -87,7 +77,6 @@ import {useAuthStore} from "@/stores/auth";
 import {useGlobalStateStore} from "@/stores";
 import {useRoute} from "vue-router";
 import {useAlertStore} from "@/stores";
-import {getAbilitiesForRoute} from "@/helpers/routing";
 
 export default {
     name: "app",
@@ -104,8 +93,8 @@ export default {
         const route = useRoute();
 
         const isLoading = computed(() => {
-            var value = false;
-            for(var i in globalStateStore.loadingElements) {
+            let value = false;
+            for(let i in globalStateStore.loadingElements) {
                 if(globalStateStore.loadingElements[i]){
                     value = true;
                     break;
@@ -118,37 +107,11 @@ export default {
             mainMenu: [
                 {
                     name: trans('global.pages.home'),
-                    icon: 'tachometer',
+                    icon: 'sun',
                     showDesktop: true,
                     showMobile: true,
                     requiresAbility: false,
                     to: '/panel/dashboard',
-                },
-                {
-                    name: trans('global.pages.users'),
-                    icon: 'users',
-                    showDesktop: true,
-                    showMobile: true,
-                    requiresAbility: getAbilitiesForRoute(['users.list', 'users.create', 'users.edit']),
-                    to: '/panel/users/list',
-                    children: [
-                        {
-                            name: trans('global.phrases.all_records'),
-                            icon: '',
-                            showDesktop: true,
-                            showMobile: true,
-                            requiresAbility: getAbilitiesForRoute('users.list'),
-                            to: '/panel/users/list',
-                        },
-                        {
-                            name: trans('global.buttons.add_new'),
-                            icon: '',
-                            showDesktop: true,
-                            showMobile: true,
-                            requiresAbility: getAbilitiesForRoute('users.create'),
-                            to: '/panel/users/create',
-                        }
-                    ]
                 },
                 {
                     name: trans('global.phrases.sign_out'),
@@ -160,12 +123,6 @@ export default {
                     to: '',
                 }
             ],
-            headerLeftLink: {
-                name: trans('global.buttons.new_record'),
-                icon: 'plus',
-                to: '',
-                href: '#',
-            },
             footerLeftLink: {
                 name: trans('global.buttons.documentation'),
                 icon: 'paperclip',

@@ -18,7 +18,7 @@ class WeatherService
 
     public function getWeather(int $userId)
     {
-        return $this->model->with('weathers')->where('user_id', $userId)->first();
+        return $this->model->with('weathers')->where('user_id', $userId)->get();
     }
 
     public function storeWeather(string $country, string $city): array
@@ -26,6 +26,11 @@ class WeatherService
         $apiResult = $this->fetchWeatherFromApi($country, $city);
         $parsedApiData = $this->parseApiDataForDatabase($apiResult);
         $this->storeWeather($apiResult);
+    }
+
+    public function removeWheaterLocation($locationId)
+    {
+        return $this->model->find($locationId)->delete();
     }
 
     public function fetchWeatherFromApi(string $country, string $city): array

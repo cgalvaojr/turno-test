@@ -50,7 +50,7 @@ return [
     ],
     'global' => [
         'pages' => [
-            'home' => 'Dashboard',
+            'home' => 'Forecasts',
             'users' => 'Users',
             'users_create' => 'New User',
             'users_edit' => 'Edit User',

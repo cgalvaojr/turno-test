@@ -9,7 +9,12 @@ export default class UserService extends BaseService {
             this.setupAPI(axios.defaults.baseURL);
         }
 
-        public async getWeather(city, country) {
-            await this.get(`/api/weather/city/${city}/country/${country}`);
+        async getWeather() {
+            // await this.get(`/api/weather/city/${city}/country/${country}`);
+            return this.get(`/api/weather`);
+        }
+
+        async removeLocation(locationId) {
+            return this.delete(`/api/weather/${locationId}`);
         }
 }
