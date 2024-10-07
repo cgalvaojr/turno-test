@@ -56,7 +56,7 @@ class WeatherService
         }
     }
 
-    private function checkLocationExists(string $country, string $city): void
+    public function checkLocationExists(string $country, string $city): void
     {
         $location = $this->weatherLocationModel
             ->where('city', $city)
@@ -84,7 +84,7 @@ class WeatherService
         return $filteredData;
     }
 
-    private function userCanCreateLocations(): bool
+    public function userCanCreateLocations(): bool
     {
         $locationCount = $this->weatherLocationModel->userLocationCount(auth()->id());
         if($locationCount < self::MAX_LOCATIONS_PER_USER) {
@@ -92,7 +92,7 @@ class WeatherService
         }
         throw new \RuntimeException('User has reached the limit of locations');
     }
-    private function parseApiDataForDatabase(array $apiData, int $locationId): array
+    public function parseApiDataForDatabase(array $apiData, int $locationId): array
     {
         $weatherData = [];
 
