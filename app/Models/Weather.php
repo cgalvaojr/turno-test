@@ -30,9 +30,4 @@ class Weather extends Model
         'visibility',
         'dt_txt',
     ];
-
-    public function weatherLocation(): BelongsTo
-    {
-        return $this->belongsTo(WeatherLocation::class);
-    }
 }

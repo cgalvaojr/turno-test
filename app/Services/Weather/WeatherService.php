@@ -18,8 +18,7 @@ class WeatherService
         private readonly WeatherHttpClient $client,
         private readonly WeatherLocation $weatherLocationModel,
         private readonly Weather $weatherModel
-    )
-    {
+    ) {
     }
 
     public function getWeather(): Builder
@@ -27,7 +26,7 @@ class WeatherService
         return $this->weatherLocationModel->with('weathers');
     }
 
-    public function removeWheaterLocation($locationId)
+    public function removeWeatherLocation($locationId)
     {
         return $this->weatherLocationModel->find($locationId)->delete();
     }
@@ -40,7 +39,7 @@ class WeatherService
     public function createLocation(string $country, string $city): void
     {
         $this->checkLocationExists($country, $city);
-        if($this->userCanCreateLocations()) {
+        if ($this->userCanCreateLocations()) {
             $apiResult = $this->fetchWeatherFromApi($country, $city);
             $filteredData = $this->filterWeatherDataByDate($apiResult);
             DB::transaction(function () use ($filteredData, $country, $city) {
@@ -63,7 +62,7 @@ class WeatherService
             ->where('country', $country)
             ->where('user_id', auth()->id())
             ->first();
-        if($location) {
+        if ($location) {
             throw new \RuntimeException('Location already exists');
         }
     }
@@ -87,11 +86,12 @@ class WeatherService
     public function userCanCreateLocations(): bool
     {
         $locationCount = $this->weatherLocationModel->userLocationCount(auth()->id());
-        if($locationCount < self::MAX_LOCATIONS_PER_USER) {
+        if ($locationCount < self::MAX_LOCATIONS_PER_USER) {
             return true;
         }
         throw new \RuntimeException('User has reached the limit of locations');
     }
+
     public function parseApiDataForDatabase(array $apiData, int $locationId): array
     {
         $weatherData = [];

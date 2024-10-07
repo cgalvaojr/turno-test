@@ -17,14 +17,14 @@ class UsersTableSeeder extends Seeder
             [
                 'first_name' => 'Luke',
                 'last_name' => 'Skywalker',
-                'email' => 'luke@jedi.com',
+                'email' => 'luke@turno.com',
                 'email_verified_at' => now(),
                 'password' => bcrypt('123123'),
             ],
             [
                 'first_name' => 'Darth',
                 'last_name' => 'Vader',
-                'email' => 'vader@jedi.com',
+                'email' => 'vader@turno.com',
                 'email_verified_at' => now(),
                 'password' => bcrypt('123123'),
             ]

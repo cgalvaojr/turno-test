@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreWeatherRequest;
 use App\Http\Resources\WeatherLocationResource;
 use App\Services\Weather\WeatherService;
 use Illuminate\Http\JsonResponse;
@@ -26,11 +27,12 @@ class WeatherController extends Controller
         return WeatherLocationResource::collection($locationsData);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreWeatherRequest $request): JsonResponse
     {
         try {
             $this->service->createLocation($request->country, $request->city);
-            return response()->json(['message' => 'Weather data has been successfully stored'], JsonResponse::HTTP_CREATED);
+            return response()->json(['message' => 'Weather data has been successfully stored'],
+                JsonResponse::HTTP_CREATED);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], JsonResponse::HTTP_BAD_REQUEST);
         }
@@ -38,7 +40,7 @@ class WeatherController extends Controller
 
     public function delete(Request $request): JsonResponse
     {
-        $this->service->removeWheaterLocation($request->locationId);
+        $this->service->removeWeatherLocation($request->locationId);
         return response()->json(['message' => 'Weather data has been successfully deleted'], JsonResponse::HTTP_OK);
     }
 }

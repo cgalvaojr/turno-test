@@ -66,7 +66,7 @@ class WeatherServiceTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        $result = $this->weatherService->removeWheaterLocation($locationId);
+        $result = $this->weatherService->removeWeatherLocation($locationId);
 
         $this->assertTrue($result);
     }
