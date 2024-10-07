@@ -2,30 +2,31 @@
     <Page>
         <div>
             <h2 class="text-lg font-semibold mb-4">Weather Details</h2>
-            <h3 class="text-lg font-semibold mb-4">{{ weatherLocations.city }} - {{ weatherLocations.country }}</h3>
-            <button @click="goBack" class="px-4 py-2 bg-blue-500 text-white rounded">Back</button>
-
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">{{ weatherLocations.city }} - {{ weatherLocations.country }}</h3>
+                <button @click="goBack" class="px-4 py-2 bg-blue-500 text-white rounded">Back</button>
+            </div>
 
             <table class="min-w-full divide-y divide-gray-200 mt-2">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Temperature</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feels Like</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weather</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wind Speed</th>
-                    </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="weather in weatherLocations.weathers" :key="weather.id">
-                        <td class="px-6 py-4 whitespace-nowrap">{{ weather.dt_txt }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ weather.temp }} °F</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ weather.feels_like }} °F</td>
-                        <td class="px-6 py-4 whitespace-nowrap"><img :src="`https://openweathermap.org/img/wn/${weather.icon}.png`" :title="weather.description" :alt="weather.description" /></td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ weather.wind_speed }} m/s</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Temperature</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feels Like</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weather</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wind Speed</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="weather in weatherLocations.weathers" :key="weather.id">
+                    <td class="px-6 py-4 whitespace-nowrap">{{ weather.dt_txt }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ weather.temp }} °F</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ weather.feels_like }} °F</td>
+                    <td class="px-6 py-4 whitespace-nowrap"><img :src="`https://openweathermap.org/img/wn/${weather.icon}.png`" :title="weather.description" :alt="weather.description" /></td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ weather.wind_speed }} m/s</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </Page>
 </template>
@@ -67,4 +68,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.flex {
+    display: flex;
+}
+.items-center {
+    align-items: center;
+}
+.justify-between {
+    justify-content: space-between;
+}
 </style>

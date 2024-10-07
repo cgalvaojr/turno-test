@@ -18,5 +18,14 @@ First, you'll need to have [docker](https://www.docker.com/) installed in your m
 docker compose up -d --build
 ```
 
-After it finishes, you'll have the application running on the port `8000`
+After it finishes, the application will be available on `http://localhost:8000`
+
+Default users:
+
+user: vader@turno.com
+pass: 123123
+
+user: luke@turno.com
+pass: 123123
+
 
